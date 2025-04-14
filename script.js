@@ -8,7 +8,7 @@ document.getElementById('csvInput').addEventListener('change', function(e) {
     complete: function(results) {
       const jsonData = results.data.filter(row => row.tenant);
 
-      fetch('https://your-project.cloudfunctions.net/api/bulk-calculate', {
+      fetch('https://us-central1-nadella-spread.cloudfunctions.net/api/bulk-calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: jsonData })
