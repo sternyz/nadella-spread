@@ -1,0 +1,35 @@
+body {
+  font-family: sans-serif;
+  padding: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+}
+header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #0078D4;
+}
+header p {
+  font-size: 1.2rem;
+  color: #555;
+}
+section h2 {
+  margin-bottom: 10px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: white;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: right;
+}
+th:first-child, td:first-child {
+  text-align: left;
+}

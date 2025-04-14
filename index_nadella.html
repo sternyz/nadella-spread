@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Nadella Spread</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Nadella Spread</h1>
+    <p>Visualize M365 license mix, client margin, and CSP optimization for your MSP</p>
+  </header>
+
+  <section>
+    <h2>Upload Tenant License CSV</h2>
+    <input type="file" id="csvInput" accept=".csv" />
+    <button id="downloadCSV">Download CSV</button>
+    <div id="results"></div>
+  </section>
+</body>
+</html>
