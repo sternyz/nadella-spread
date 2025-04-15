@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Nadella Spread</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Nadella Spread</h1>
+    <p>Visualize M365 license mix, client margin, and CSP optimization for your MSP</p>
+    <p><a href="calculator.html" style="font-size: 1.1rem; color: #0078D4;">→ Open Single Client Calculator</a></p>
+  </header>
+
+  <section>
+    <h2>Upload Tenant License CSV</h2>
+    <input type="file" id="csvInput" accept=".csv" />
+    <button id="downloadCSV">Download CSV</button>
+    <div id="results"></div>
+  </section>
+</body>
+</html>
