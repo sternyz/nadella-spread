@@ -1,73 +1,103 @@
-document.getElementById('csvInput').addEventListener('change', function(e) {
+
+let globalData = [];
+
+function renderTable(data) {
+  const container = document.getElementById('results');
+  container.innerHTML = "";
+  const table = document.createElement('table');
+  table.border = 1;
+  table.style.marginTop = '20px';
+
+  const header = table.insertRow();
+  [
+    'Tenant', 'SKU', 'Licenses', 'Client Price ($)', 'Monthly CSP Cost ($)',
+    'Annual CSP Cost ($)', 'Profit (Current) ($)',
+    'Profit (Optimized) ($)', 'Delta Profit ($)'
+  ].forEach(text => {
+    const th = document.createElement('th');
+    th.textContent = text;
+    header.appendChild(th);
+  });
+
+  data.forEach(row => {
+    const r = table.insertRow();
+    [
+      row.tenant, row.sku, row.count,
+      row.client_price, row.your_monthly_price, row.your_annual_price,
+      row.current_profit, row.optimized_profit, row.delta_profit
+    ].forEach(cell => {
+      const td = r.insertCell();
+      td.textContent = typeof cell === 'number' ? cell.toFixed(2) : cell;
+    });
+  });
+  container.appendChild(table);
+}
+
+function calculateProfits() {
+  globalData = globalData.map(row => {
+    const clientAnnual = row.client_price * row.count * 12;
+    const currentCSP = row.your_monthly_price * row.count * 12;
+    const currentProfit = clientAnnual - currentCSP;
+    return {
+      ...row,
+      current_profit: currentProfit,
+      optimized_profit: 0,
+      delta_profit: 0
+    };
+  });
+  renderTable(globalData);
+}
+
+function applyOptimizedForecast() {
+  const annualCSP = parseFloat(document.getElementById('optimizedCost').value);
+  const clientMonthly = parseFloat(document.getElementById('clientRate').value);
+
+  if (isNaN(annualCSP) || isNaN(clientMonthly)) return;
+
+  globalData = globalData.map(row => {
+    const currentCSP = row.your_monthly_price * row.count * 12;
+    const currentProfit = row.client_price * row.count * 12 - currentCSP;
+    const optimizedProfit = (clientMonthly * row.count * 12) - (annualCSP * row.count);
+    const deltaProfit = optimizedProfit - currentProfit;
+    return {
+      ...row,
+      optimized_profit: optimizedProfit,
+      delta_profit: deltaProfit
+    };
+  });
+  renderTable(globalData);
+}
+
+document.getElementById('csvInput').addEventListener('change', function (e) {
   const file = e.target.files[0];
   if (!file) return;
-
   Papa.parse(file, {
     header: true,
     dynamicTyping: true,
-    complete: function(results) {
-      const jsonData = results.data.filter(row => row.tenant);
-
-      fetch('https://us-central1-nadella-spread.cloudfunctions.net/api/bulk-calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: jsonData })
-      })
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('results');
-        container.innerHTML = "";
-        const table = document.createElement('table');
-        table.border = 1;
-        table.style.marginTop = '20px';
-
-        const header = table.insertRow();
-        [
-          'Tenant', 'Licenses', 'Annualized %', 'Client Bill ($)',
-          'CSP Cost (Current) ($)', 'CSP Cost (Optimized) ($)',
-          'Profit (Current) ($)', 'Profit (Optimized) ($)', 'Delta Profit ($)'
-        ].forEach(text => {
-          const th = document.createElement('th');
-          th.textContent = text;
-          header.appendChild(th);
-        });
-
-        data.tenants.forEach(t => {
-          const row = table.insertRow();
-          row.insertCell().textContent = t.tenant;
-          row.insertCell().textContent = t.total_licenses;
-          row.insertCell().textContent = t.annualized_pct + '%';
-          row.insertCell().textContent = t.client_bill.toFixed(2);
-          row.insertCell().textContent = t.current_cost.toFixed(2);
-          row.insertCell().textContent = t.optimized_cost.toFixed(2);
-          row.insertCell().textContent = t.current_profit.toFixed(2);
-          row.insertCell().textContent = t.optimized_profit.toFixed(2);
-          row.insertCell().textContent = t.delta_profit.toFixed(2);
-        });
-
-        container.appendChild(table);
-      });
+    complete: function (results) {
+      globalData = results.data.filter(row => row.tenant && row.count);
+      calculateProfits();
     }
   });
 });
 
+document.getElementById('applyOptimized').addEventListener('click', applyOptimizedForecast);
+
 document.getElementById('downloadCSV').addEventListener('click', () => {
   const headers = [
-    'Tenant', 'Licenses', 'Annualized %', 'Client Bill ($)',
-    'CSP Cost (Current) ($)', 'CSP Cost (Optimized) ($)',
-    'Profit (Current) ($)', 'Profit (Optimized) ($)', 'Delta Profit ($)'
+    'Tenant', 'SKU', 'Licenses', 'Client Price ($)', 'Monthly CSP Cost ($)',
+    'Annual CSP Cost ($)', 'Profit (Current) ($)', 'Profit (Optimized) ($)', 'Delta Profit ($)'
   ];
-
-  const rows = Array.from(document.querySelectorAll('table tr'))
-    .slice(1)
-    .map(row => Array.from(row.cells).map(cell => cell.textContent));
-
-  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const rows = globalData.map(row => [
+    row.tenant, row.sku, row.count, row.client_price, row.your_monthly_price,
+    row.your_annual_price, row.current_profit, row.optimized_profit, row.delta_profit
+  ]);
+  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'm365_tenant_profitability.csv';
+  a.download = 'nadella_profit_analysis.csv';
   a.style.display = 'none';
   document.body.appendChild(a);
   a.click();
