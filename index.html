@@ -6,12 +6,34 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="script.js" defer></script>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    #logo {
+      height: 70px;
+      vertical-align: middle;
+      margin-right: 12px;
+    }
+    .loading {
+      display: none;
+      font-weight: bold;
+      color: #8d5524;
+      animation: fadeInOut 2s infinite;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1>Nadella Spread</h1>
+    <h1>
+      <img id="logo" src="favicon.png" alt="Nadella Spread Jar Logo" title="Satya would be proud." />
+      Nadella Spread
+    </h1>
     <p>Visualize M365 license mix, client margin, and CSP optimization for your MSP</p>
     <p><a href="calculator.html" style="font-size: 1.1rem; color: #0078D4;">→ Open Single Client Calculator</a></p>
+    <div class="loading" id="loadingText">Spreading margins like Nutella...</div>
   </header>
 
   <section>
